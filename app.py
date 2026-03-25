@@ -21,6 +21,14 @@ def login():
     else:
         return "<h1>Đăng nhập thất bại. Thử lại đi 'gà'!</h1>"
 
+@app.route('/home')
+def home():
+    return "<h1>Chào mừng bạn đã đến với trang HOME!</h1><p>Đây là link con đầu tiên của bạn.</p>"
+
+@app.route('/roblox')
+def roblox_page():
+    return "<h1>Trang Fan của Roblox</h1><p>Bạn có thích chơi Blox Fruit không?</p>"
+    
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
 
