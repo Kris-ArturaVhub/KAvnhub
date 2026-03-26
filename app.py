@@ -85,7 +85,7 @@ def home():
 
         <div class="content">
             <h1>🚀 KAvnhub_space </h1>
-            <p style="color: #666;">Chào mừng bạn đến với không gian ảo. Đây là nơi tôi lưu trữ thông tin quan trọng.</p>
+            <p style="color: #666;">Chào mừng bạn đến với không gian ảo. Đây là nơi tôi lưu trữ các links.</p>
 
             <div class="music-player">
                 <p style="margin-right: 15px; font-weight: bold;">🎵 Đang phát:</p>
@@ -112,13 +112,13 @@ def home():
             </div>
 
             <div style="text-align: center; margin-top: 40px;">
-                <a href="https://www.facebook.com/share/1JKumr9zp1/" class="btn" style="background: #1DA1F2; width: 80%;">Facebook</a><br>
+                
                 <a href="/links" class="btn btn-blue" style="width: 200px;">Khám phá thêm ➔</a>
             </div>
         </div>
     </div>
     
-    <p style="text-align: center; color: #aaa; margin-top: 20px;">© 2024 Ninh Hòa Web Project</p>
+    <p style="text-align: center; color: #aaa; margin-top: 20px;">© 2024 10110 Web Project</p>
     '''
     
 
@@ -137,5 +137,5 @@ def other_links():
     '''
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=8080)
+    app.run(host='0.0.0.0', port=8080)
     
