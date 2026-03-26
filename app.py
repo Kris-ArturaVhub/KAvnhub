@@ -81,7 +81,7 @@ def home():
     </style>
 
     <div class="container">
-         <img src="/static/anh1.png" alt="..." style="width: 200px; border-radius: 10px;">
+         <img src="/static/anh1.jpg" alt="..." style="width: 200px; border-radius: 10px;">
 
         <div class="content">
             <h1>🚀 KAvnhub_space </h1>
