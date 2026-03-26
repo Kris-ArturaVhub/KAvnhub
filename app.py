@@ -20,10 +20,10 @@ def index():
     return COMMON_STYLE + '''
     <div class="card">
         <h2>Xác minh bảo mật</h2>
-        <p>Vui lòng xác nhận bạn không phải là Robot để tiếp tục.</p>
+        <p>Vui lòng xác nhận bạn không phải là Gay để tiếp tục.</p>
         <div style="border: 1px solid #ccc; padding: 15px; background: #fafafa; border-radius: 5px; display: flex; align-items: center; gap: 10px; margin: 20px 0;">
             <input type="checkbox" id="captcha" style="width: 25px; height: 25px; cursor: pointer;" onclick="setTimeout(() => { window.location.href='/home' }, 500)">
-            <label for="captcha" style="cursor: pointer;">Tôi không phải là người máy</label>
+            <label for="captcha" style="cursor: pointer;">Tôi không phải là gay</label>
             <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/RecaptchaLogo.svg" width="30" style="margin-left: auto;">
         </div>
     </div>
@@ -98,7 +98,7 @@ def home():
             <div class="info-grid">
                 <div class="info-box">
                     <h3>👤 Profile</h3>
-                    <p>Bí danh: Kris_Artura <br>Born: 2010 <br>Vị trí: Khánh Hòa, VN</p>
+                    <p>Bí danh: Kris_Artura <br>Genz <br>Vị trí: Khánh Hòa, VN</p>
                 </div>
                 <div class="info-box" style="border-left-color: #28a745;">
                     <h3>💻 profile</h3>
