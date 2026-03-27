@@ -1,4 +1,5 @@
 from flask import Flask, render_template_string, redirect, url_for
+import requests
 
 app = Flask(__name__)
 app.secret_key = 'kris_artura_2026' # Chìa khóa để mã hóa mã xác thực
@@ -22,77 +23,34 @@ def captcha():
     
     return '''
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <div style="text-align: center; padding: 50px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f9; height: 100vh;">
-        <div style="background: white; padding: 30px; border-radius: 15px; display: inline-block; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-            <h2 style="color: #333; margin-bottom: 20px;">KAVNHUB SECURITY</h2>
-            
-            <div class="g-recaptcha" data-sitekey="6LeA3JksAAAAAKEYSY3MDVtN6YJkdN_-JJiSwNtU"></div>
-            
-            <form action="/verify" method="post">
-                <input type="password" name="user_key" placeholder="Nhập mật mã truy cập..." 
-                       style="padding: 12px; width: 250px; border-radius: 8px; border: 2px solid #ddd; margin-bottom: 20px; outline: none;">
-                
-                <br>
-
-                <div style="background: #fafafa; border: 1px solid #d3d3d3; padding: 15px; border-radius: 5px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-                    <input type="checkbox" id="captcha_check" style="width: 20px; height: 20px; cursor: pointer;" 
-                           onchange="document.getElementById('submit_btn').disabled = !this.checked;">
-                    <label for="captcha_check" style="margin-left: 10px; font-size: 14px; color: #555; cursor: pointer;">
-                        Tôi xác nhận không phải là người máy
-                    </label>
-                </div>
-
-                <button type="submit" id="submit_btn" disabled 
-                        style="padding: 12px 30px; background: #007bff; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; opacity: 0.5;">
-                    XÁC NHẬN VÀO HỆ THỐNG
-                </button>
-            </form>
-            
-            <p style="font-size: 12px; color: #aaa; margin-top: 20px;">© 2026 Kris Artura VNHub Portal</p>
-        </div>
-    </div>
-
-    <script>
-        // Hiệu ứng làm sáng nút khi tick vào ô
-        const checkbox = document.getElementById('captcha_check');
-        const btn = document.getElementById('submit_btn');
-        checkbox.addEventListener('change', function() {
-            if (this.checked) {
-                btn.style.opacity = "1";
-                btn.style.backgroundColor = "#28a745"; // Đổi sang màu xanh lá cho ngầu
-            } else {
-                btn.style.opacity = "0.5";
-                btn.style.backgroundColor = "#007bff";
-            }
-        });
-    </script>
+   
     '''
     
 
 @app.route('/verify', methods=['POST'])
 def verify():
-    import requests
-    import flask
-    
-    # 1. Lấy Pass và kết quả ô tích từ người dùng
-    user_pass = flask.request.form.get('user_key')
-    captcha_res = flask.request.form.get('g-recaptcha-response')
+    user_pass = request.form.get('user_key')
+    captcha_res = request.form.get('g-recaptcha-response') # Đây là cái tick từ Google
 
-    # 2. Check mật mã trước
+    # 1. Kiểm tra Pass trước
     if user_pass != "ArturaVhub":
         return 'Sai mã rồi! <a href="/">Quay lại</a>'
 
-    # 3. Check ô tích với Google (Thay Secret Key của anh vào đây)
+    # 2. Kiểm tra Captcha (Đoạn này làm cho Captcha có tác dụng nè)
+    if not captcha_res:
+        return 'Vui lòng tick vào ô "Tôi không phải người máy"! <a href="/">Quay lại</a>'
+
+    # Gửi mã xác nhận lên Google
     v = requests.post('https://www.google.com/recaptcha/api/siteverify', data={
-        'secret': 'DÁN_SECRET_KEY_CỦA_ANH_VÀO_ĐÂY',
+        'secret': 'SECRET_KEY_CỦA_ANH', # Dán Secret Key vào đây
         'response': captcha_res
     }).json()
 
     if v.get('success'):
-        flask.session['logged_in'] = True
-        return flask.redirect('/home')
+        session['is_logged_in'] = True
+        return redirect('/home') # Chỉ khi thành công mới cho qua trang 2
     else:
-        return 'Lỗi Captcha hoặc bạn chưa tích ô! <a href="/">Thử lại</a>'
+        return 'Xác thực Captcha thất bại! <a href="/">Thử lại</a>'
     
 
 # --- LINK 2 (TRANG HOME PRO) ---
