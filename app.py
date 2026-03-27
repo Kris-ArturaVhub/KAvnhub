@@ -19,10 +19,13 @@ COMMON_STYLE = '''
 # --- LINK CHÍNH (TRANG CAPTCHA) ---
 @app.route('/')
 def captcha():
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     return '''
     <div style="text-align: center; padding: 50px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f9; height: 100vh;">
         <div style="background: white; padding: 30px; border-radius: 15px; display: inline-block; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
             <h2 style="color: #333; margin-bottom: 20px;">KAVNHUB SECURITY</h2>
+            
+            <div class="g-recaptcha" data-sitekey="6LeA3JksAAAAAKEYSY3MDVtN6YJkdN_-JJiSwNtU"></div>
             
             <form action="/verify" method="post">
                 <input type="password" name="user_key" placeholder="Nhập mật mã truy cập..." 
@@ -67,14 +70,29 @@ def captcha():
 
 @app.route('/verify', methods=['POST'])
 def verify():
+    import requests
     import flask
-    user_input = flask.request.form.get('user_key')
-    if user_input == "ArturaVhub": # Đây là Key của anh
-        flask.session['is_logged_in'] = True
+    
+    # 1. Lấy Pass và kết quả ô tích từ người dùng
+    user_pass = flask.request.form.get('user_key')
+    captcha_res = flask.request.form.get('g-recaptcha-response')
+
+    # 2. Check mật mã trước
+    if user_pass != "ArturaVhub":
+        return 'Sai mã rồi! <a href="/">Quay lại</a>'
+
+    # 3. Check ô tích với Google (Thay Secret Key của anh vào đây)
+    v = requests.post('https://www.google.com/recaptcha/api/siteverify', data={
+        'secret': 'DÁN_SECRET_KEY_CỦA_ANH_VÀO_ĐÂY',
+        'response': captcha_res
+    }).json()
+
+    if v.get('success'):
+        flask.session['logged_in'] = True
         return flask.redirect('/home')
     else:
-        return '<h3>Sai mã rồi! <a href="/">Quay lại</a></h3>'
-        
+        return 'Lỗi Captcha hoặc bạn chưa tích ô! <a href="/">Thử lại</a>'
+    
 
 # --- LINK 2 (TRANG HOME PRO) ---
 @app.route('/home')
