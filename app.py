@@ -1,9 +1,8 @@
-from flask import Flask, render_template_string, redirect, url_for
+from flask import Flask, render_template_string, redirect, url_for, request, session
 import requests
 
 app = Flask(__name__)
-app.secret_key = 'kris_artura_2026' # Chìa khóa để mã hóa mã xác thực
-
+app.secret_key = 'kris_artura_2026'
 
 # --- GIAO DIỆN TỔNG THỂ (CSS) ---
 COMMON_STYLE = '''
@@ -17,101 +16,70 @@ COMMON_STYLE = '''
 </style>
 '''
 
-# --- LINK CHÍNH (TRANG CAPTCHA) ---
+# --- TRANG CHỦ (CÓ PASS + RECAPTCHA) ---
 @app.route('/')
 def captcha():
-    
-    return '''
+    # Anh nhớ thay SITE_KEY của anh vào đây nhé
+    SITE_KEY = "6LeA3JksAAAAAKEYSY3MDVtN6YJkdN_-JJiSwNtU"
+    return COMMON_STYLE + f'''
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-   
+    <div class="card">
+        <h2>KAVNHUB SECURITY</h2>
+        <form action="/verify" method="post">
+            <input type="password" name="user_key" placeholder="Nhập mã truy cập..." 
+                   style="padding: 12px; width: 80%; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px;">
+            <div class="g-recaptcha" data-sitekey="{SITE_KEY}" style="margin-bottom: 20px; display: flex; justify-content: center;"></div>
+            <button type="submit" class="btn btn-blue" style="width: 100%;">XÁC NHẬN</button>
+        </form>
+    </div>
     '''
-    
 
 @app.route('/verify', methods=['POST'])
 def verify():
     user_pass = request.form.get('user_key')
-    captcha_res = request.form.get('g-recaptcha-response') # Đây là cái tick từ Google
+    captcha_res = request.form.get('g-recaptcha-response')
+    
+    # Anh nhớ thay SECRET_KEY của anh vào đây
+    SECRET_KEY = "6LeA3JksAAAAAG097PtdygLJZGGwVekNckKmixpR"
 
-    # 1. Kiểm tra Pass trước
     if user_pass != "ArturaVhub":
         return 'Sai mã rồi! <a href="/">Quay lại</a>'
 
-    # 2. Kiểm tra Captcha (Đoạn này làm cho Captcha có tác dụng nè)
     if not captcha_res:
         return 'Vui lòng tick vào ô "Tôi không phải người máy"! <a href="/">Quay lại</a>'
 
-    # Gửi mã xác nhận lên Google
     v = requests.post('https://www.google.com/recaptcha/api/siteverify', data={
-        'secret': 'SECRET_KEY_CỦA_ANH', # Dán Secret Key vào đây
+        'secret': SECRET_KEY,
         'response': captcha_res
     }).json()
 
     if v.get('success'):
         session['is_logged_in'] = True
-        return redirect('/home') # Chỉ khi thành công mới cho qua trang 2
+        return redirect(url_for('home'))
     else:
         return 'Xác thực Captcha thất bại! <a href="/">Thử lại</a>'
-    
 
-# --- LINK 2 (TRANG HOME PRO) ---
+# --- TRANG HOME (GIỮ NGUYÊN CODE CỦA ANH) ---
 @app.route('/home')
 def home():
-    import flask
-    if not flask.session.get('is_logged_in'):
-        return flask.redirect('/')
+    if not session.get('is_logged_in'):
+        return redirect(url_for('captcha'))
         
     return COMMON_STYLE + '''
     <style>
-        /* Cho phép trang web có thể vuốt xuống */
         body { height: auto; padding: 20px 0; display: block; } 
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden; /* Để ảnh không bị tràn góc bo */
-            padding-bottom: 30px;
-        }
-
-        .header-img {
-            width: 100%;
-            height: 250px;
-            object-fit: cover; /* Giúp ảnh không bị méo */
-        }
-
-        .content { padding: 30px; text-align: left; }
-
-        .music-player {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .info-box {
-            background: #eef2f7;
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 5px solid #007bff;
-        }
+        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; padding-bottom: 30px; }
+        .music-player { background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0; display: flex; align-items: center; justify-content: center; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .info-box { background: #eef2f7; padding: 15px; border-radius: 10px; border-left: 5px solid #007bff; }
     </style>
 
     <div class="container">
-         <img src="/https://github.com/Kris-ArturaVhub/KAvnhub/raw/main/Screenshot_2026-anhnen.jpg" alt="..." style="width: 200px; border-radius: 10px;">
+         <div style="text-align:center; padding: 20px;">
+            <img src="https://github.com/Kris-ArturaVhub/KAvnhub/raw/main/Screenshot_2026-anhnen.jpg" alt="..." style="width: 200px; border-radius: 10px;">
+         </div>
 
-        <div class="content">
+        <div style="padding: 30px; text-align: left;">
             <h1>🚀 KAvnhub_space </h1>
             <p style="color: #666;">Chào mừng bạn đến với không gian ảo. Đây là nơi tôi lưu trữ các links.</p>
 
@@ -119,7 +87,6 @@ def home():
                 <p style="margin-right: 15px; font-weight: bold;">🎵 Đang phát:</p>
                 <audio controls autoplay loop>
                     <source src="https://github.com/Kris-ArturaVhub/KAvnhub/raw/main/livingroomsong.mp3" type="audio/mpeg">
-                    Trình duyệt của bạn không hỗ trợ phát nhạc.
                 </audio>
             </div>
 
@@ -130,46 +97,38 @@ def home():
                 </div>
                 <div class="info-box" style="border-left-color: #28a745;">
                     <h3>💻 profile</h3>
-                    <p>• Python / Flask<br>• SQL Injection (Basic)<br>• sdt:84+799.269_197</p>
+                    <p>• Python / Flask<br>• SQL Injection (Basic)<br>• sdt: 84+799.269_197</p>
                 </div>
             </div>
 
             <div style="margin-top: 30px;">
-                <h3>📜 Thông tư</h3>
-                <p>Lưu ý: web được tạo bởi thực tập sinh IT cùng AI,đảm bảo an toàn tuyệt đối.</p>
+                <h3>📜: </h3>
+                <p> Version 1.0, đảm bảo an toàn tuyệt đối🛡️.</p>
             </div>
 
             <div style="text-align: center; margin-top: 40px;">
-                
                 <a href="/links" class="btn btn-blue" style="width: 200px;">Khám phá thêm ➔</a><br>
                 <a href="https://www.facebook.com/share/1JKumr9zp1/" class="btn" style="background: #1DA1F2; width: 40%;">Facebook</a><br>
                 <a href="https://www.tiktok.com/@ka.19920425?_r=1&_t=ZS-950s2mflaGA" class="btn" style="background: #ce1126; width: 40%;">Tiktok</a><br>
             </div>
         </div>
     </div>
-    
     <p style="text-align: center; color: #aaa; margin-top: 20px;">© 2024 10110 Web Project</p>
     '''
-    
 
-# --- LINK 3 (DANH SÁCH LINK TỰ GẮN) ---
 @app.route('/links')
 def other_links():
+    if not session.get('is_logged_in'):
+        return redirect(url_for('captcha'))
     return COMMON_STYLE + '''
     <div class="card">
         <h2>🔗 Danh mục liên kết</h2>
         <p>Chọn nơi bạn muốn đến:</p>
         <a href="https://www.roblox.com" class="btn" style="background: #ce1126; width: 80%;">Vào Roblox</a><br>
         <a href="https://google.com" class="btn" style="background: #4285F4; width: 80%;">Tìm kiếm Google</a><br>
-        <a href="/" class="btn" style="background: #6c757d; width: 80%;">Quay lại từ đầu</a>
-        <a href="https://www.facebook.com/share/1JKumr9zp1/" class="btn" style="background: #1DA1F2; width: 80%;">Facebook</a><br>
+        <a href="/home" class="btn" style="background: #6c757d; width: 80%;">Quay lại trang chủ</a>
     </div>
     '''
 
-    
-
-
-    
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
-    
