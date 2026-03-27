@@ -45,6 +45,10 @@ def verify():
 # --- LINK 2 (TRANG HOME PRO) ---
 @app.route('/home')
 def home():
+    import flask
+    if not flask.session.get('is_logged_in'):
+        return flask.redirect('/')
+        
     return COMMON_STYLE + '''
     <style>
         /* Cho phép trang web có thể vuốt xuống */
@@ -150,36 +154,7 @@ def other_links():
         <a href="https://www.facebook.com/share/1JKumr9zp1/" class="btn" style="background: #1DA1F2; width: 80%;">Facebook</a><br>
     </div>
     '''
-@app.route('/home')
-def home():
-    import flask
-    # Kiểm tra nếu chưa nhập mã thì đuổi về trang chủ
-    if not flask.session.get('is_logged_in'):
-        return flask.redirect('/')
 
-    # Nếu đã nhập mã đúng, hiện ảnh và nhạc
-    return '''
-    <div style="text-align: center; padding: 20px; font-family: sans-serif;">
-        <h1 style="color: #28a745;">TRUY CẬP THÀNH CÔNG!</h1>
-        
-        <img src="https://github.com/Kris-ArturaVhub/KAvnhub/raw/main/Screenshot_2026-anhnen.jpg" 
-             style="width: 100%; max-width: 400px; border-radius: 15px;">
-        
-        <br><br>
-        <audio controls autoplay>
-            <source src="https://github.com/Kris-ArturaVhub/KAvnhub/raw/main/livingroomsong.mp3" type="audio/mpeg">
-        </audio>
-        
-        <br><br>
-        <a href="/logout" style="color: red;">Đăng xuất</a>
-    </div>
-    '''
-
-@app.route('/logout')
-def logout():
-    import flask
-    flask.session.pop('is_logged_in', None)
-    return flask.redirect('/')
     
 
 
