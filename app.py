@@ -19,17 +19,51 @@ COMMON_STYLE = '''
 # --- LINK CHÍNH (TRANG CAPTCHA) ---
 @app.route('/')
 def captcha():
-    # Trang này chỉ hiện ô nhập mã, không hiện ảnh/nhạc
     return '''
-    <div style="text-align: center; padding: 50px; font-family: sans-serif;">
-        <h2>HỆ THỐNG KAVNHUB</h2>
-        <p>Vui lòng nhập mã truy cập:</p>
-        <form action="/verify" method="post">
-            <input type="text" name="user_key" placeholder="Nhập Key..." style="padding: 10px; border-radius: 5px;">
-            <button type="submit" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px;">Vào hệ thống</button>
-        </form>
+    <div style="text-align: center; padding: 50px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f9; height: 100vh;">
+        <div style="background: white; padding: 30px; border-radius: 15px; display: inline-block; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+            <h2 style="color: #333; margin-bottom: 20px;">KAVNHUB SECURITY</h2>
+            
+            <form action="/verify" method="post">
+                <input type="password" name="user_key" placeholder="Nhập mật mã truy cập..." 
+                       style="padding: 12px; width: 250px; border-radius: 8px; border: 2px solid #ddd; margin-bottom: 20px; outline: none;">
+                
+                <br>
+
+                <div style="background: #fafafa; border: 1px solid #d3d3d3; padding: 15px; border-radius: 5px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <input type="checkbox" id="captcha_check" style="width: 20px; height: 20px; cursor: pointer;" 
+                           onchange="document.getElementById('submit_btn').disabled = !this.checked;">
+                    <label for="captcha_check" style="margin-left: 10px; font-size: 14px; color: #555; cursor: pointer;">
+                        Tôi xác nhận không phải là người máy
+                    </label>
+                </div>
+
+                <button type="submit" id="submit_btn" disabled 
+                        style="padding: 12px 30px; background: #007bff; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; opacity: 0.5;">
+                    XÁC NHẬN VÀO HỆ THỐNG
+                </button>
+            </form>
+            
+            <p style="font-size: 12px; color: #aaa; margin-top: 20px;">© 2026 Kris Artura VNHub Portal</p>
+        </div>
     </div>
+
+    <script>
+        // Hiệu ứng làm sáng nút khi tick vào ô
+        const checkbox = document.getElementById('captcha_check');
+        const btn = document.getElementById('submit_btn');
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                btn.style.opacity = "1";
+                btn.style.backgroundColor = "#28a745"; // Đổi sang màu xanh lá cho ngầu
+            } else {
+                btn.style.opacity = "0.5";
+                btn.style.backgroundColor = "#007bff";
+            }
+        });
+    </script>
     '''
+    
 
 @app.route('/verify', methods=['POST'])
 def verify():
